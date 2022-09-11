@@ -4,12 +4,9 @@ namespace App\Http\Controllers\Blog\Admin;
 
 use App\Http\Requests\BlogCategoryUpdateRequest;
 use App\Http\Requests\BlogCategoryCreateRequest;
-//use App\Http\Controllers\Blog\BaseController;//
 use App\Models\BlogCategory;
 use App\Repositories\BlogCategoryRepository;
-//use Illuminate\Http\Request;//
-//use Illuminate\Support\Str;//
-//use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;//
 
 /**
  * Управление категориями бллога
@@ -68,19 +65,15 @@ class CategoryController extends BaseController
     public function store(BlogCategoryCreateRequest $request)
     {
         $data = $request->input();
-        if (empty($data['slug'])) {
-            $data['slug'] = Str::slug($data['title']);
-        }
-
         //Создаст объект и добавит в БД
         $item = (new BlogCategory())->create($data);
 
         if ($item) {
             return redirect()->route('blog.admin.categories.edit', [$item->id])
-            ->with(['success' => 'Успешно сохранено']);
+                             ->with(['success' => 'Успешно сохранено']);
         } else {
             return back()->withErrors(['msg' => 'Ошибка сохранения'])
-            ->withInput();
+                         ->withInput();
         }
     }
 
@@ -97,7 +90,8 @@ class CategoryController extends BaseController
         if (empty($item)) {
             abort(404);
         }
-        $categoryList = $blogCategoryRepository->getForComboBox();
+        $categoryList 
+            = $this->blogCategoryRepository->getForComboBox();
 
         return view('blog.admin.categories.edit',
         compact('item', 'categoryList'));
@@ -106,7 +100,7 @@ class CategoryController extends BaseController
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  BlogCategoryUpdateRequest  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
@@ -121,10 +115,6 @@ class CategoryController extends BaseController
         }
 
         $data = $request->all();
-        if (empty($data['slug'])) {
-            $data['slug'] = Str::slug($data['title']);
-        }
-
         $result = $item->update($data);
 
         if ($result) {

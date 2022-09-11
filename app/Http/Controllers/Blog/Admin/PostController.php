@@ -5,6 +5,11 @@ namespace App\Http\Controllers\Blog\Admin;
 use App\Repositories\BlogPostRepository;
 use App\Repositories\BlogCategoryRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use App\Http\Requests\BlogPostUpdateRequest;
+use Carbon\Carbon;
+use App\Http\Requests\BlogPostCreateRequest;
+use App\Models\BlogPost;
 
 
 /**
@@ -54,18 +59,33 @@ class PostController extends BaseController
      */
     public function create()
     {
-        dd(__METHOD__);
+        $item = new BlogPost();
+        $categoryList
+            = $this->blogCategoryRepository->getForComboBox();
+
+        return view('blog.admin.posts.edit',
+            compact('item', 'categoryList'));
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  BlogPostCreateRequest  $request
+     * 
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(BlogPostCreateRequest $request)
     {
-        //
+        $data = $request->input();
+        $item = (new BlogPost())->create($data);
+
+        if ($item) {
+            return redirect()->route('blog.admin.posts.edit', [$item->id])
+                             ->with(['success' => 'Успешно сохранено']);
+        } else {
+            return back()->withErrors(['msg' => 'Ошибка сохранения'])
+                         ->withInput();
+        }
     }
 
     /**
@@ -103,13 +123,42 @@ class PostController extends BaseController
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  BlogPostUpdateRequest  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(BlogPostUpdateRequest $request, $id)
     {
-        dd(__METHOD__, $request->all(), $id);
+        $item = $this->blogPostRepository->getEdit($id);
+
+        if (empty($item)) {
+            return back()
+                ->withErrors(['msg' => "Запись id=[{$id}] не найдена"])
+                ->withInput();
+        }
+
+        $data = $request->all();
+
+        /*
+        // Ушло в обсервер
+        if (empty($data['slug'])) {
+            $data['slug'] = \Str::slug($data['title']);
+        }
+        if (empty($item->published_at) && $data['is_published']) {
+            $data['published_at'] = Carbon::now();
+        }*/
+
+        $result = $item->update($data);
+
+        if ($result) {
+            return redirect()
+                ->route('blog.admin.posts.edit', $item->id)
+                ->with(['success' => 'Успешно сохранено']);
+        } else {
+            return back()
+                ->withErrors(['msg' => 'Ошибка сохранения'])
+                ->withInput();
+        }
     }
 
     /**
@@ -120,6 +169,6 @@ class PostController extends BaseController
      */
     public function destroy($id)
     {
-        dd(__METHOD__, $id, $request->all());
+        dd(__METHOD__, $id, request()->all());
     }
 }
