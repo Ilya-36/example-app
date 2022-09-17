@@ -34,8 +34,7 @@ class CategoryController extends BaseController
      */
     public function index()
     {
-        //$paginator = BlogCategory::paginate(15);
-        $paginator = $this->blogCategoryRepository->getAllWithPaginate(5);
+        $paginator = $this->blogCategoryRepository->getAllWithPaginate(25);
         
         return view ('blog.admin.categories.index', compact('paginator'));
     }
@@ -87,6 +86,22 @@ class CategoryController extends BaseController
     public function edit($id, BlogCategoryRepository $categoryRepository)
     {
         $item = $this->blogCategoryRepository->getEdit($id);
+
+        $v['title_before'] = $item->title;
+
+        $item->title = 'ASDasdasdaSD asdasd 1212';
+
+        $v['title_after'] = $item->title;
+        $v['getAttribute'] = $item->getAttribute('title');
+        $v['attributesToArray'] = $item->attributesToArray();
+        @$v['attributes'] = $item->attributes['title'];
+        $v['getAttributeValue'] = $item->getAttributeValue('title');
+        $v['getMutatedAttributes'] = $item->getMutatedAttributes();
+        $v['hasGetMutator for title'] = $item->hasGetMutator('title');
+        $v['toArray'] = $item->toArray();
+
+        dd($v, $item);
+
         if (empty($item)) {
             abort(404);
         }
