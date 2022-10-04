@@ -24,6 +24,11 @@ Route::get('/api/kek', function () {
 Auth::routes();
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
+Route::group(['prefix' => 'digging_deeper',], function () {
+    Route::get('/collections', [App\Http\Controllers\DiggingDeeperController::class, 'collections'])
+        ->name('digging_deeper.collections');
+});
+
 
 Route::group(['namespace' => 'App\Http\Controllers\Blog', 'prefix' => 'blog'], function () {
     Route::resource('posts', PostController::class)->names('blog.posts');
