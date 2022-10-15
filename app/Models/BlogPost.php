@@ -23,7 +23,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class BlogPost extends Model
 {
-    use SoftDeletes;
+   use SoftDeletes;
+   //use HasFactory;
 
     const UNKNOWN_USER = 1;
 
