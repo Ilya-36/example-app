@@ -11,19 +11,18 @@ class BlogPostFactory extends Factory
 {
     /**
      * Define the model's default state.
-     *
      * @return array
      */
     public function definition()
     {
- //       return [
-//        $factory->define(\App\Models\BlogPost::class, function (Faker $faker) {
+
+        //$factory->define(App\Models\BlogPost::class, function (Faker $faker) {
             
             $title = $this->faker->sentence(rand(3, 8), true);
             $txt = $this->faker->realText(rand(1000, 4000));
             $isPublished = rand(1,5) > 1;
 
-           // $createdAt = $this->faker->dateTimeBetween('-3 months','-2 months');
+            //$createdAt = $this->faker->dateTimeBetween('-3 months','-2 months');
 
             $data = [
                 'category_id'   => rand(1, 11),
@@ -36,12 +35,12 @@ class BlogPostFactory extends Factory
                 'is_published'  => $isPublished,
                 'published_at'  => $isPublished ? $this->faker->dateTimeBetween('-2 months',
                     '-1 days') : null,
-              //  'created_at'    => $createdAt,
+                //'created_at'    => $createdAt,
                 //'update_at'     => $createdAt,
             ];
 
             return $data;
-    //}
+        }
         
-    }
+    //}
 }
