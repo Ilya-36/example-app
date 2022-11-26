@@ -10,7 +10,8 @@ use App\Http\Requests\BlogPostUpdateRequest;
 use Carbon\Carbon;
 use App\Http\Requests\BlogPostCreateRequest;
 use App\Models\BlogPost;
-
+use App\Jobs\BlogPostAfterCreateJob;
+use App\Jobs\BlogPostAfterDeleteJob;
 
 /**
  * Управление статьями блога
@@ -77,26 +78,19 @@ class PostController extends BaseController
     public function store(BlogPostCreateRequest $request)
     {
         $data = $request->input();
-        $item = (new BlogPost())->create($data);
+        //$item = (new BlogPost())->create($data);
+        $item = BlogPost::create($data);
 
         if ($item) {
+            $job = new BlogPostAfterCreateJob($item);
+            $this->dispatch($job);
+
             return redirect()->route('blog.admin.posts.edit', [$item->id])
                              ->with(['success' => 'Успешно сохранено']);
         } else {
             return back()->withErrors(['msg' => 'Ошибка сохранения'])
                          ->withInput();
         }
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
     }
 
     /**
@@ -138,16 +132,6 @@ class PostController extends BaseController
         }
 
         $data = $request->all();
-
-        /*
-        // Ушло в обсервер
-        if (empty($data['slug'])) {
-            $data['slug'] = \Str::slug($data['title']);
-        }
-        if (empty($item->published_at) && $data['is_published']) {
-            $data['published_at'] = Carbon::now();
-        }*/
-
         $result = $item->update($data);
 
         if ($result) {
@@ -178,6 +162,7 @@ class PostController extends BaseController
         //$result = BlogPost::find($id)->forceDelete();
 
         if ($result) {
+            BlogPostAfterDeleteJob::dispatch($id)->delay(20);
             return redirect()
                 ->route('blog.admin.posts.index')
                 ->with(['success' => "Запись id[$id] удалена"]);
