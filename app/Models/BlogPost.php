@@ -24,7 +24,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class BlogPost extends Model
 {
    use SoftDeletes;
-   //use HasFactory;
+   //use HasFactory; //для рефреша базы данных
 
     const UNKNOWN_USER = 1;
 
