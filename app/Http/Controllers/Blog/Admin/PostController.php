@@ -13,8 +13,6 @@ use App\Models\BlogPost;
 use App\Jobs\BlogPostAfterCreateJob;
 use App\Jobs\BlogPostAfterDeleteJob;
 
-
-
 /**
  * Управление статьями блога
  * 
