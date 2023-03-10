@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\BlogPost;
 use Carbon\Carbon;
+use App\Jobs\GenerateCatalog\GenerateCatalogMainJob;
 
 class DiggingDeeperController extends Controller
 {
@@ -133,5 +134,25 @@ class DiggingDeeperController extends Controller
         // dd(compact('sortedSimpleCollection', 
         //     'sortedAscCollection',
         //     'sortedDescCollection'));
+    }
+
+    public function processVideo()
+    {
+        ProcessVideoJob::dispatch()
+            // Отсрочка выполнения задания от момента помещения в очередь.
+            // Не влияет на паузу между попытками выполнять задачу.
+            //->delay (10)
+            //->onQueue('name_of_queue')
+        ;
+    }
+
+    /**
+     * @link http://laravel.local/digging_deeper/prepare-catalog
+     * 
+     * php artisan queue:listen --queue=generate-catalog --tries=3 --delay=10
+     */
+    public function prepareCatalog()
+    {
+        GenerateCatalogMainJob::dispatch();
     }
 }
